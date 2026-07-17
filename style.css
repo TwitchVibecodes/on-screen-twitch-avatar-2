@@ -266,6 +266,15 @@ body[data-state="coding"] #codeEyes text { animation: codeblink 1s steps(2) infi
 .divider { width: 1px; height: 24px; background: rgba(255,255,255,0.12); margin: 0 4px; }
 .hint { margin-left: auto; color: var(--muted); font-size: 0.75rem; }
 
+.voice-name {
+  color: var(--muted);
+  font-size: 0.72rem;
+  max-width: 130px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 /* ---------- toggle switch ---------- */
 .toggle {
   display: inline-flex;

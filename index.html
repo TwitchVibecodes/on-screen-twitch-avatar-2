@@ -121,7 +121,12 @@
       <span class="track"><span class="thumb"></span></span>
       Auto vibe
     </label>
-    <span class="hint">keys 1–5 switch moods · G = green screen · O = OBS setup</span>
+    <label class="toggle small" id="voiceToggle" title="Claude's text-to-speech voice">
+      <input type="checkbox" id="voiceOn" checked />
+      <span class="track"><span class="thumb"></span></span>
+      🔊 Voice <span class="voice-name" id="voiceName"></span>
+    </label>
+    <span class="hint">keys 1–5 switch moods · V = voice · G = green screen · O = OBS setup</span>
   </footer>
 
   <!-- OBS setup modal -->
@@ -131,6 +136,23 @@
         <h2 id="obsModalTitle">🎥 Wire into OBS</h2>
         <button class="modal-close" id="obsClose" aria-label="Close">✕</button>
       </div>
+      <section class="obs-auto">
+        <h3>⚡ Automatic — one click</h3>
+        <p class="obs-auto-sub">
+          Connects to OBS's built-in WebSocket server and drops a <i>Claude Avatar</i> browser
+          source straight into your <b>live scene</b>. In OBS 28+ enable it once via
+          <b>Tools → WebSocket Server Settings → Enable</b>.
+        </p>
+        <div class="auto-row">
+          <label>Port <input id="obsPort" value="4455" inputmode="numeric" spellcheck="false" /></label>
+          <label>Password <input id="obsPass" type="password" placeholder="(blank if auth off)" spellcheck="false" /></label>
+          <button class="auto-btn" id="obsAutoAdd">🚀 Add to my stream</button>
+        </div>
+        <p class="auto-status" id="obsAutoStatus" hidden></p>
+      </section>
+
+      <div class="obs-divider"><span>or manually</span></div>
+
       <ol class="obs-steps">
         <li>In OBS: <b>Sources → + → Browser</b>, name it <i>Claude Avatar</i>.</li>
         <li>Paste this URL and set <b>Width 1920 × Height 1080</b>:</li>
@@ -145,7 +167,8 @@
       </ol>
       <div class="obs-params">
         URL knobs: <code>?obs=1</code> overlay mode · <code>&amp;bg=green</code> chroma-key green instead of transparent ·
-        <code>&amp;mood=coding</code> lock a mood · <code>&amp;auto=0</code> disable auto vibe
+        <code>&amp;mood=coding</code> lock a mood · <code>&amp;auto=0</code> disable auto vibe ·
+        <code>&amp;voice=0</code> mute the voice
       </div>
     </div>
   </div>
