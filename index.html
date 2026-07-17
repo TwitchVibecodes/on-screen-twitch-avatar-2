@@ -18,6 +18,7 @@
         <span class="track"><span class="thumb"></span></span>
         OBS green screen
       </label>
+      <button class="obs-btn" id="obsSetup" title="key: O">🎥 Wire into OBS</button>
     </div>
   </header>
 
@@ -120,8 +121,34 @@
       <span class="track"><span class="thumb"></span></span>
       Auto vibe
     </label>
-    <span class="hint">keys 1–5 switch moods · G = green screen</span>
+    <span class="hint">keys 1–5 switch moods · G = green screen · O = OBS setup</span>
   </footer>
+
+  <!-- OBS setup modal -->
+  <div class="modal-backdrop" id="obsModal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="obsModalTitle">
+      <div class="modal-head">
+        <h2 id="obsModalTitle">🎥 Wire into OBS</h2>
+        <button class="modal-close" id="obsClose" aria-label="Close">✕</button>
+      </div>
+      <ol class="obs-steps">
+        <li>In OBS: <b>Sources → + → Browser</b>, name it <i>Claude Avatar</i>.</li>
+        <li>Paste this URL and set <b>Width 1920 × Height 1080</b>:</li>
+      </ol>
+      <div class="url-row">
+        <input id="obsUrl" readonly spellcheck="false" />
+        <button class="copy-btn" id="copyUrl">Copy</button>
+      </div>
+      <ol class="obs-steps" start="3">
+        <li>Done — the background renders <b>transparent</b>, so Claude floats right on top of your stream. No chroma key needed.</li>
+        <li>To poke the avatar live, right-click the source → <b>Interact</b> (keys 1–5 switch moods there).</li>
+      </ol>
+      <div class="obs-params">
+        URL knobs: <code>?obs=1</code> overlay mode · <code>&amp;bg=green</code> chroma-key green instead of transparent ·
+        <code>&amp;mood=coding</code> lock a mood · <code>&amp;auto=0</code> disable auto vibe
+      </div>
+    </div>
+  </div>
 
   <script src="app.js"></script>
 </body>

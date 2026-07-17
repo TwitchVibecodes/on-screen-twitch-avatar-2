@@ -224,8 +224,54 @@
   const gs = $("greenscreen");
   gs.addEventListener("change", () => body.classList.toggle("greenscreen", gs.checked));
 
+  /* ---------- OBS wiring ---------- */
+  // Runs as an OBS Browser Source: ?obs=1 (or auto-detected via window.obsstudio,
+  // which OBS injects into every browser source).
+  const params = new URLSearchParams(location.search);
+  const inOBS = params.get("obs") === "1" || typeof window.obsstudio !== "undefined";
+
+  if (inOBS) {
+    body.classList.add("obs-overlay"); // transparent bg, chrome hidden
+    if (params.get("bg") === "green") {
+      gs.checked = true;
+      body.classList.add("greenscreen");
+    }
+    // No cursor lives inside a browser source — let the eyes wander on their own.
+    setInterval(() => {
+      target = { x: (Math.random() * 2 - 1) * 5, y: (Math.random() * 2 - 1) * 4 };
+    }, 2600);
+  }
+
+  /* ---------- OBS setup modal ---------- */
+  const obsModal = $("obsModal");
+  const obsUrlInput = $("obsUrl");
+  const copyBtn = $("copyUrl");
+
+  function openObsModal() {
+    obsUrlInput.value = location.origin + location.pathname + "?obs=1";
+    copyBtn.textContent = "Copy";
+    obsModal.hidden = false;
+    obsUrlInput.select();
+  }
+  $("obsSetup").addEventListener("click", openObsModal);
+  $("obsClose").addEventListener("click", () => (obsModal.hidden = true));
+  obsModal.addEventListener("click", (e) => {
+    if (e.target === obsModal) obsModal.hidden = true;
+  });
+  copyBtn.addEventListener("click", async () => {
+    try {
+      await navigator.clipboard.writeText(obsUrlInput.value);
+    } catch {
+      obsUrlInput.select();
+      document.execCommand("copy");
+    }
+    copyBtn.textContent = "Copied!";
+    setTimeout(() => (copyBtn.textContent = "Copy"), 1600);
+  });
+
   /* ---------- keyboard shortcuts ---------- */
   window.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") { obsModal.hidden = true; return; }
     if (e.target.tagName === "INPUT" || e.target.tagName === "TEXTAREA") return;
     const idx = "12345".indexOf(e.key);
     if (idx !== -1) {
@@ -234,6 +280,8 @@
     } else if (e.key.toLowerCase() === "g") {
       gs.checked = !gs.checked;
       gs.dispatchEvent(new Event("change"));
+    } else if (e.key.toLowerCase() === "o" && !inOBS) {
+      openObsModal();
     }
   });
 
@@ -244,6 +292,13 @@
   });
 
   /* ---------- hello ---------- */
-  setState("idle", { speak: false });
-  setTimeout(() => say("Hey chat! This is what I look like, apparently. 🧡"), 600);
+  if (params.get("auto") === "0") autoInput.checked = false;
+  const startMood = params.get("mood");
+  if (startMood && STATES.includes(startMood)) {
+    autoInput.checked = false; // a locked mood stays locked
+    setState(startMood, { speak: false });
+  } else {
+    setState("idle", { speak: false });
+  }
+  setTimeout(() => say(inOBS ? "We're live! Hi chat, I'm on the stream now. 🧡" : "Hey chat! This is what I look like, apparently. 🧡"), 600);
 })();

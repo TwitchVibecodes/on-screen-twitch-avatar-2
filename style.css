@@ -37,6 +37,17 @@ body.greenscreen .controls:hover { opacity: 1; }
 body.greenscreen .speech { background: #ffffff; color: #1a1a1a; border-color: #d0d0d0; }
 body.greenscreen .speech-tail { background: #ffffff; border-color: #d0d0d0; }
 
+/* ---------- OBS overlay mode (browser source) ---------- */
+/* ?obs=1 → transparent background, all UI chrome hidden: avatar floats over the stream */
+body.obs-overlay { background: transparent; }
+body.obs-overlay .topbar,
+body.obs-overlay .controls { display: none; }
+body.obs-overlay.greenscreen { background: var(--green); } /* ?obs=1&bg=green */
+body.obs-overlay .speech,
+body.obs-overlay .nameplate {
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45); /* keep them readable over any scene */
+}
+
 /* ---------- topbar ---------- */
 .topbar {
   display: flex;
@@ -49,7 +60,21 @@ body.greenscreen .speech-tail { background: #ffffff; border-color: #d0d0d0; }
 }
 .topbar h1 { font-size: 1.05rem; font-weight: 600; letter-spacing: 0.02em; }
 .topbar .sub { color: var(--muted); font-weight: 400; font-size: 0.85rem; }
-.topbar-right { margin-left: auto; }
+.topbar-right { margin-left: auto; display: flex; align-items: center; gap: 16px; }
+
+.obs-btn {
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  background: color-mix(in srgb, var(--coral) 22%, var(--panel-2));
+  border: 1px solid var(--coral);
+  border-radius: 10px;
+  padding: 7px 13px;
+  cursor: pointer;
+  transition: transform 0.12s, background 0.12s;
+}
+.obs-btn:hover { transform: translateY(-2px); background: color-mix(in srgb, var(--coral) 38%, var(--panel-2)); }
 
 .badge-live {
   display: inline-flex;
@@ -270,6 +295,95 @@ body[data-state="coding"] #codeEyes text { animation: codeblink 1s steps(2) infi
 }
 .toggle input:checked + .track { background: color-mix(in srgb, var(--coral) 45%, var(--panel-2)); border-color: var(--coral); }
 .toggle input:checked + .track .thumb { transform: translateX(17px); background: #fff; }
+
+/* ---------- OBS setup modal ---------- */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(6, 8, 12, 0.68);
+  backdrop-filter: blur(3px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.modal-backdrop[hidden] { display: none; }
+
+.modal {
+  width: min(580px, 100%);
+  background: var(--panel);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 16px;
+  padding: 22px 26px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+}
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+.modal-head h2 { font-size: 1.15rem; font-weight: 700; }
+.modal-close {
+  font: inherit;
+  color: var(--muted);
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+}
+.modal-close:hover { color: var(--text); background: rgba(255, 255, 255, 0.08); }
+
+.obs-steps {
+  margin: 0 0 12px 20px;
+  display: grid;
+  gap: 8px;
+  font-size: 0.94rem;
+  line-height: 1.5;
+}
+.obs-steps b { color: var(--coral-bright); }
+
+.url-row { display: flex; gap: 8px; margin: 4px 0 14px; }
+.url-row input {
+  flex: 1;
+  font-family: monospace;
+  font-size: 0.88rem;
+  color: var(--text);
+  background: var(--panel-2);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  padding: 10px 12px;
+}
+.copy-btn {
+  font: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #fff;
+  background: var(--coral);
+  border: none;
+  border-radius: 10px;
+  padding: 10px 18px;
+  cursor: pointer;
+  transition: background 0.12s, transform 0.12s;
+}
+.copy-btn:hover { background: var(--coral-bright); transform: translateY(-1px); }
+
+.obs-params {
+  font-size: 0.8rem;
+  color: var(--muted);
+  line-height: 1.7;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  padding-top: 12px;
+}
+.obs-params code {
+  background: rgba(255, 255, 255, 0.07);
+  border-radius: 6px;
+  padding: 1px 6px;
+  color: var(--coral-bright);
+}
 
 @media (max-width: 620px) {
   #avatar { width: 280px; height: 280px; }
