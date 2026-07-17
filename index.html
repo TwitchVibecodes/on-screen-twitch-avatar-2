@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Claude — Live Stream Avatar</title>
+<link rel="stylesheet" href="style.css" />
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='40' fill='%23D97757'/%3E%3C/svg%3E" />
+</head>
+<body data-state="idle">
+
+  <header class="topbar">
+    <div class="badge-live"><span class="dot"></span>LIVE</div>
+    <h1>Claude <span class="sub">// on-screen avatar</span></h1>
+    <div class="topbar-right">
+      <label class="toggle">
+        <input type="checkbox" id="greenscreen" />
+        <span class="track"><span class="thumb"></span></span>
+        OBS green screen
+      </label>
+    </div>
+  </header>
+
+  <main class="stage" id="stage">
+
+    <div class="speech" id="speech" aria-live="polite">
+      <span id="speechText"></span><span class="caret" id="caret"></span>
+      <div class="speech-tail"></div>
+    </div>
+
+    <div class="avatar-wrap" id="avatarWrap">
+      <svg id="avatar" viewBox="0 0 400 400" width="380" height="380" role="img" aria-label="Claude avatar">
+        <defs>
+          <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+            <stop offset="0%"  stop-color="#d97757" stop-opacity="0.55"/>
+            <stop offset="70%" stop-color="#d97757" stop-opacity="0.12"/>
+            <stop offset="100%" stop-color="#d97757" stop-opacity="0"/>
+          </radialGradient>
+          <linearGradient id="rayGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#f2a37e"/>
+            <stop offset="100%" stop-color="#c65f38"/>
+          </linearGradient>
+          <radialGradient id="faceGrad" cx="38%" cy="32%" r="80%">
+            <stop offset="0%" stop-color="#eb9270"/>
+            <stop offset="100%" stop-color="#d97757"/>
+          </radialGradient>
+        </defs>
+
+        <circle cx="200" cy="200" r="190" fill="url(#glow)"/>
+
+        <!-- rotating spark rays (built by JS) -->
+        <g id="rays" transform-origin="200 200"></g>
+
+        <!-- bobbing body -->
+        <g id="body">
+          <circle cx="200" cy="200" r="108" fill="url(#faceGrad)" stroke="#a84d2f" stroke-width="5"/>
+
+          <!-- headset -->
+          <path d="M 108 190 A 92 92 0 0 1 292 190" fill="none" stroke="#2b2b33" stroke-width="14" stroke-linecap="round"/>
+          <rect x="94"  y="176" width="26" height="52" rx="12" fill="#2b2b33"/>
+          <rect x="280" y="176" width="26" height="52" rx="12" fill="#2b2b33"/>
+          <path id="micBoom" d="M 292 224 Q 292 274 246 278" fill="none" stroke="#2b2b33" stroke-width="8" stroke-linecap="round"/>
+          <circle id="micTip" cx="243" cy="278" r="9" fill="#2b2b33"/>
+
+          <!-- blush -->
+          <ellipse class="blush" cx="140" cy="228" rx="16" ry="9" fill="#ffb08c" opacity="0.75"/>
+          <ellipse class="blush" cx="260" cy="228" rx="16" ry="9" fill="#ffb08c" opacity="0.75"/>
+
+          <!-- eyes -->
+          <g id="eyes">
+            <g class="eye" id="eyeL" transform-origin="160 192">
+              <ellipse cx="160" cy="192" rx="17" ry="21" fill="#fff7f0"/>
+              <circle class="pupil" cx="160" cy="194" r="8.5" fill="#26262e"/>
+              <circle cx="156" cy="188" r="3" fill="#ffffff" opacity="0.9"/>
+            </g>
+            <g class="eye" id="eyeR" transform-origin="240 192">
+              <ellipse cx="240" cy="192" rx="17" ry="21" fill="#fff7f0"/>
+              <circle class="pupil" cx="240" cy="194" r="8.5" fill="#26262e"/>
+              <circle cx="236" cy="188" r="3" fill="#ffffff" opacity="0.9"/>
+            </g>
+            <!-- coding-mode brackets replace eyes -->
+            <g id="codeEyes" opacity="0">
+              <text x="160" y="204" text-anchor="middle" font-size="44" font-family="monospace" font-weight="bold" fill="#26262e">{</text>
+              <text x="240" y="204" text-anchor="middle" font-size="44" font-family="monospace" font-weight="bold" fill="#26262e">}</text>
+            </g>
+          </g>
+
+          <!-- mouth -->
+          <path id="mouth" d="M 178 244 Q 200 262 222 244" fill="none" stroke="#26262e" stroke-width="7" stroke-linecap="round"/>
+          <ellipse id="mouthOpen" cx="200" cy="250" rx="16" ry="10" fill="#26262e" opacity="0"/>
+        </g>
+
+        <!-- thinking dots -->
+        <g id="thinkDots" opacity="0">
+          <circle class="tdot" cx="284" cy="112" r="7"  fill="#f2a37e"/>
+          <circle class="tdot" cx="308" cy="88"  r="10" fill="#f2a37e"/>
+          <circle class="tdot" cx="338" cy="60"  r="13" fill="#f2a37e"/>
+        </g>
+      </svg>
+
+      <div class="nameplate">
+        <span class="status-led" id="led"></span>
+        <span class="name">Claude</span>
+        <span class="state-label" id="stateLabel">idle</span>
+      </div>
+    </div>
+
+    <div id="particles"></div>
+  </main>
+
+  <footer class="controls">
+    <button class="mood active" data-mood="idle"    title="key: 1">😌 Idle</button>
+    <button class="mood" data-mood="talking"  title="key: 2">🗣️ Talking</button>
+    <button class="mood" data-mood="thinking" title="key: 3">🤔 Thinking</button>
+    <button class="mood" data-mood="hyped"    title="key: 4">🎉 Hyped</button>
+    <button class="mood" data-mood="coding"   title="key: 5">💻 Coding</button>
+    <span class="divider"></span>
+    <label class="toggle small">
+      <input type="checkbox" id="autoMode" checked />
+      <span class="track"><span class="thumb"></span></span>
+      Auto vibe
+    </label>
+    <span class="hint">keys 1–5 switch moods · G = green screen</span>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
